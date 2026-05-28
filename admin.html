@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · Edit Landing Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-0:       #050507;
+      --hi:         #F4F4F6;
+      --lo:         #8C8C95;
+      --lo-dim:     #5A5A62;
+      --line:       rgba(255,255,255,0.08);
+      --line-hi:    rgba(255,255,255,0.28);
+      --sheen:      rgba(255,255,255,0.85);
+      --r:          22px;
+      --r-sm:       12px;
+      --r-xs:       10px;
+      --blur:       blur(8px) saturate(120%);
+      --fh:         'Archivo', system-ui, sans-serif;
+      --fb:         'Space Grotesk', system-ui, sans-serif;
+      --danger:     #F87171;
+    }
+
+    html { color-scheme: dark; }
+
+    body {
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, #161618 0%, transparent 70%),
+        linear-gradient(180deg, #08080a 0%, #050507 100%);
+      color: var(--hi);
+      font-family: var(--fb);
+      font-size: 15px;
+      line-height: 1.55;
+      min-height: 100svh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #bg {
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+
+    .page {
+      position: relative; z-index: 1;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 28px 16px 80px;
+    }
+
+    /* ── Liquid Glass ─────────────────────────────── */
+    .lg {
+      position: relative;
+      isolation: isolate;
+      background: linear-gradient(160deg,
+        rgba(255,255,255,0.055) 0%,
+        rgba(255,255,255,0.022) 60%,
+        rgba(255,255,255,0.008) 100%);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.14),
+        inset 0 -1px 0 rgba(0,0,0,0.35),
+        0 8px 28px rgba(0,0,0,0.45),
+        0 1px 0 rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+    .lg::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(135deg,
+        rgba(255,255,255,0.055) 0%,
+        transparent 22%,
+        transparent 72%,
+        rgba(255,255,255,0.020) 100%);
+      z-index: 0;
+    }
+    .lg::after {
+      content: '';
+      position: absolute;
+      top: -40%; left: -20%;
+      width: 70%; height: 90%;
+      background: radial-gradient(ellipse at center,
+        rgba(255,255,255,0.025),
+        transparent 65%);
+      filter: blur(18px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .lg > * { position: relative; z-index: 1; }
+
+    /* ── Page header ──────────────────────────────── */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+      padding: 0 4px;
+    }
+    .topbar-title {
+      font-family: var(--fh);
+      font-size: 15px; font-weight: 600;
+      letter-spacing: -.1px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .topbar-title svg {
+      width: 16px; height: 16px;
+      stroke: var(--lo); fill: none; stroke-width: 1.8;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .topbar-actions {
+      display: flex; gap: 8px;
+    }
+    .top-link {
+      font-size: 12px;
+      color: var(--lo); text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      transition: color 200ms, background 200ms;
+    }
+    .top-link:hover {
+      color: var(--hi);
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ── Gate (login + setup) ─────────────────────── */
+    .gate {
+      max-width: 380px;
+      margin: 12vh auto 0;
+      padding: 32px 28px;
+      text-align: center;
+    }
+    .gate-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #3A3A40 0%, #08080A 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 -2px 4px rgba(0,0,0,0.4),
+        0 4px 16px rgba(0,0,0,0.6);
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+    }
+    .gate-icon svg {
+      width: 22px; height: 22px;
+      stroke: var(--hi); fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .gate-title {
+      font-family: var(--fh);
+      font-size: 18px; font-weight: 600;
+      letter-spacing: -.2px;
+      margin-bottom: 6px;
+    }
+    .gate-sub {
+      font-size: 13px; color: var(--lo);
+      margin-bottom: 22px;
+    }
+    .gate-form {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .gate-error {
+      font-size: 12px; color: var(--danger);
+      min-height: 14px;
+      margin-top: -4px;
+    }
+    .gate-reset {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--lo-dim);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .gate-reset:hover { color: var(--lo); }
+
+    /* ── Form fields ──────────────────────────────── */
+    .field {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .field label {
+      font-size: 10.5px; font-weight: 600;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--lo);
+    }
+    .field select {
+      width: 100%;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid var(--line);
+      border-radius: var(--r-xs);
+      color: var(--hi);
+      font-family: var(--fb);
+      font-size: 14px;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: border-color 200ms, background 200ms;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C8C95' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    .field select:focus {
+      outline: none;
+      border-color: var(--line-hi);
+      background-color: rgba(255,255,255,0.055);
+    }
+    .field select option { background: #141418; color: var(--hi); }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid var(--line);
+      border-radius: var(--r-xs);
+      color: var(--hi);
+      font-family: var(--fb);
+      font-size: 14px;
+      padding: 10px 12px;
+      line-height: 1.45;
+      transition: border-color 200ms, background 200ms;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .field textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    .field input:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--line-hi);
+      background: rgba(255,255,255,0.055);
+    }
+    .field input::placeholder,
+    .field textarea::placeholder { color: var(--lo-dim); }
+
+    /* ── Buttons ──────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      font-family: var(--fb);
+      font-size: 13px; font-weight: 500;
+      color: var(--hi);
+      background: linear-gradient(180deg,
+        rgba(255,255,255,0.10) 0%,
+        rgba(255,255,255,0.035) 100%);
+      border: 1px solid var(--line-hi);
+      border-radius: var(--r-xs);
+      padding: 10px 16px;
+      cursor: pointer;
+      letter-spacing: .01em;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 -1px 0 rgba(0,0,0,0.25);
+      transition: background 200ms, border-color 200ms, transform 100ms;
+    }
+    .btn:hover {
+      background: linear-gradient(180deg,
+        rgba(255,255,255,0.18) 0%,
+        rgba(255,255,255,0.06) 100%);
+      border-color: rgba(255,255,255,0.42);
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:focus-visible {
+      outline: 2px solid var(--sheen);
+      outline-offset: 2px;
+    }
+
+    /* File input button styling (inherit from .btn) */
+    input[type="file"]::file-selector-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      font-family: var(--fb);
+      font-size: 13px; font-weight: 500;
+      color: var(--hi);
+      background: linear-gradient(180deg,
+        rgba(255,255,255,0.10) 0%,
+        rgba(255,255,255,0.035) 100%);
+      border: 1px solid var(--line-hi);
+      border-radius: var(--r-xs);
+      padding: 10px 16px;
+      cursor: pointer;
+      letter-spacing: .01em;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 -1px 0 rgba(0,0,0,0.25);
+      transition: background 200ms, border-color 200ms, transform 100ms;
+      margin-right: 8px;
+    }
+    input[type="file"]::file-selector-button:hover {
+      background: linear-gradient(180deg,
+        rgba(255,255,255,0.18) 0%,
+        rgba(255,255,255,0.06) 100%);
+      border-color: rgba(255,255,255,0.42);
+    }
+    input[type="file"]::file-selector-button:active {
+      transform: scale(0.98);
+    }
+
+    .btn.full { width: 100%; }
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--line);
+      box-shadow: none;
+      color: var(--lo);
+    }
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.04);
+      color: var(--hi);
+    }
+    .btn-danger {
+      background: rgba(248, 113, 113, 0.08);
+      border-color: rgba(248, 113, 113, 0.3);
+      color: var(--danger);
+      box-shadow: none;
+    }
+    .btn-danger:hover {
+      background: rgba(248, 113, 113, 0.16);
+      border-color: rgba(248, 113, 113, 0.5);
+    }
+    .btn-sm {
+      font-size: 12px;
+      padding: 6px 10px;
+    }
+    .btn svg {
+      width: 14px; height: 14px;
+      stroke: currentColor; fill: none; stroke-width: 1.8;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* ── Editor sections ──────────────────────────── */
+    .section {
+      padding: 22px 22px 22px;
+      margin-bottom: 16px;
+    }
+    .section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--fh);
+      font-size: 13px; font-weight: 600;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--lo);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 540px) {
+      .grid-2.cols { grid-template-columns: 100px 1fr; align-items: end; }
+    }
+    .row {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+
+    /* ── Project sub-card ─────────────────────────── */
+    .pcard {
+      padding: 16px;
+      border-radius: var(--r-sm);
+      background: rgba(255,255,255,0.022);
+      border: 1px solid var(--line);
+      display: flex; flex-direction: column; gap: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .pcard-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px;
+    }
+    .pcard-index {
+      font-family: var(--fh);
+      font-size: 11px; font-weight: 600;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--lo-dim);
+    }
+    .pcard-actions {
+      display: flex; gap: 6px;
+    }
+    .ibtn {
+      width: 28px; height: 28px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--lo);
+      cursor: pointer;
+      transition: color 200ms, background 200ms, border-color 200ms;
+    }
+    .ibtn:hover {
+      color: var(--hi);
+      background: rgba(255,255,255,0.08);
+      border-color: var(--line-hi);
+    }
+    .ibtn.danger:hover {
+      color: var(--danger);
+      background: rgba(248,113,113,0.1);
+      border-color: rgba(248,113,113,0.4);
+    }
+    .ibtn svg {
+      width: 13px; height: 13px;
+      stroke: currentColor; fill: none; stroke-width: 1.8;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* ── Action bar ───────────────────────────────── */
+    .action-bar {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      justify-content: space-between;
+      padding: 16px 0 0;
+      border-top: 1px solid var(--line);
+      margin-top: 10px;
+      margin-bottom: 24px;
+    }
+    .action-bar > div { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ── Toast ────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translate(-50%, 20px);
+      background: linear-gradient(180deg,
+        rgba(40,40,46,0.95) 0%,
+        rgba(20,20,24,0.95) 100%);
+      border: 1px solid var(--line-hi);
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: var(--hi);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        0 12px 32px rgba(0,0,0,0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 240ms ease, transform 240ms ease;
+      z-index: 100;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    /* ── Footer ─────────────────────────────────── */
+    footer {
+      margin-top: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 11px; letter-spacing: .04em;
+      color: var(--lo-dim);
+    }
+    .footer-link {
+      color: inherit;
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    .footer-link:hover {
+      color: var(--hi);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn, .ibtn, #toast { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <div class="page">
+
+    <!-- ── Login / Setup gate ───────────────────────── -->
+    <div id="gate-login" class="lg gate" hidden>
+      <div class="gate-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="10" rx="2"/>
+          <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+        </svg>
+      </div>
+      <h1 class="gate-title">Admin Access</h1>
+      <p class="gate-sub">Enter your secret to edit the landing page.</p>
+      <form class="gate-form" id="login-form">
+        <div class="field">
+          <input type="password" id="login-input" placeholder="Secret" autocomplete="current-password" required />
+        </div>
+        <p class="gate-error" id="login-error">&nbsp;</p>
+        <button type="submit" class="btn full">Continue</button>
+      </form>
+    </div>
+
+    <div id="gate-unconfigured" class="lg gate" hidden>
+      <div class="gate-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <h1 class="gate-title">Not configured</h1>
+      <p class="gate-sub">Set <code style="font-family:monospace;background:rgba(255,255,255,0.07);padding:2px 6px;border-radius:5px;font-size:12px">ADMIN_SECRET_HASH</code> in <code style="font-family:monospace;background:rgba(255,255,255,0.07);padding:2px 6px;border-radius:5px;font-size:12px">config.js</code> to enable admin access.</p>
+    </div>
+
+    <!-- ── Editor ───────────────────────────────────── -->
+    <div id="editor" hidden>
+      <div class="topbar">
+        <div class="topbar-title">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Editor
+        </div>
+        <div class="topbar-actions">
+          <a href="index.html" target="_blank" class="top-link">View live →</a>
+          <button id="logout" class="top-link" style="border:none;background:none;cursor:pointer;font-family:inherit;">Logout</button>
+        </div>
+      </div>
+
+      <!-- Actions (top) -->
+      <div class="action-bar">
+        <div>
+          <button id="save" class="btn">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+            Save changes
+          </button>
+          <button id="discard" class="btn btn-ghost">Discard</button>
+        </div>
+        <div>
+          <button id="reset-data" class="btn btn-ghost btn-sm">Reset to defaults</button>
+        </div>
+      </div>
+
+      <!-- Profile -->
+      <section class="lg section" aria-label="Profile editor">
+        <div class="section-head">
+          <h2 class="section-title">Profile</h2>
+        </div>
+
+        <div class="row">
+          <div class="grid-2 cols">
+            <div class="field">
+              <label for="f-initials">Initials</label>
+              <input type="text" id="f-initials" maxlength="3" />
+            </div>
+            <div class="field">
+              <label for="f-name">Name</label>
+              <input type="text" id="f-name" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="f-image-file">Profile Image <span style="color: #888; font-size: 11px;">(upload or paste URL)</span></label>
+            <div style="display: flex; gap: 8px; flex-direction: column;">
+              <input type="file" id="f-image-file" accept="image/*" />
+              <input type="text" id="f-image" placeholder="Or paste image URL here..." />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="f-role">Role / Tagline</label>
+            <input type="text" id="f-role" />
+          </div>
+
+          <div class="field">
+            <label for="f-bio">Bio</label>
+            <textarea id="f-bio" rows="2"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Socials -->
+      <section class="lg section" aria-label="Social links editor">
+        <div class="section-head">
+          <h2 class="section-title">Social Links</h2>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="f-github">GitHub URL</label>
+            <input type="url" id="f-github" placeholder="https://github.com/your-username" />
+          </div>
+          <div class="field">
+            <label for="f-linkedin">LinkedIn URL</label>
+            <input type="url" id="f-linkedin" placeholder="https://linkedin.com/in/your-username" />
+          </div>
+          <div class="field">
+            <label for="f-twitter">Twitter / X URL</label>
+            <input type="url" id="f-twitter" placeholder="https://x.com/your-username" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Projects -->
+      <section class="lg section" aria-label="Projects editor">
+        <div class="section-head">
+          <h2 class="section-title">Projects</h2>
+          <button id="add-project" class="btn btn-sm">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Add card
+          </button>
+        </div>
+        <div class="row" id="projects-list"></div>
+      </section>
+
+    </div>
+
+    <footer>
+      <span>Admin Console &middot; Created by <a href="https://github.com/Yash21116" target="_blank" rel="noopener noreferrer" class="footer-link">Yash</a></span>
+    </footer>
+
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="data.js"></script>
+  <script>
+    /* ── Mini helpers ─────────────────────────────── */
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => document.querySelectorAll(sel);
+
+    function show(id) { $(id).hidden = false; }
+    function hide(id) { $(id).hidden = true; }
+
+    function toast(msg, ms = 1800) {
+      const t = $('#toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => t.classList.remove('show'), ms);
+    }
+
+    /* ── Gate flow ────────────────────────────────── */
+    function showGate() {
+      hide('#editor');
+      hide('#gate-login');
+      hide('#gate-unconfigured');
+      if (!hasSecret()) {
+        show('#gate-unconfigured');
+      } else {
+        show('#gate-login');
+        setTimeout(() => $('#login-input').focus(), 50);
+      }
+    }
+
+    function showEditor() {
+      hide('#gate-login');
+      hide('#gate-unconfigured');
+      show('#editor');
+      populateEditor(loadData());
+    }
+
+    /* Login */
+    $('#login-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const input = $('#login-input').value;
+      const err = $('#login-error');
+      if (checkSecret(input)) {
+        err.textContent = ' ';
+        $('#login-input').value = '';
+        showEditor();
+      } else {
+        err.textContent = 'Incorrect secret.';
+        $('#login-input').select();
+      }
+    });
+
+    /* Logout */
+    $('#logout').addEventListener('click', () => {
+      showGate();
+    });
+
+    /* ── Editor: populate ─────────────────────────── */
+    function populateEditor(data) {
+      $('#f-initials').value = data.profile.initials || '';
+      $('#f-image').value    = data.profile.image || '';
+      $('#f-name').value     = data.profile.name || '';
+      $('#f-role').value     = data.profile.role || '';
+      $('#f-bio').value      = data.profile.bio || '';
+      $('#f-github').value   = data.profile.socials.github || '';
+      $('#f-linkedin').value = data.profile.socials.linkedin || '';
+      $('#f-twitter').value  = data.profile.socials.twitter || '';
+
+      renderProjectsList(data.projects);
+    }
+
+    /* ── Editor: project rows ─────────────────────── */
+    function renderProjectsList(projects) {
+      const list = $('#projects-list');
+      list.innerHTML = projects.map((p, i) => projectRowHTML(p, i)).join('');
+      attachProjectListeners();
+    }
+
+    function projectRowHTML(p, i) {
+      return `
+        <div class="pcard" data-i="${i}">
+          <div class="pcard-head">
+            <span class="pcard-index">Card ${i + 1}${i === 0 ? ' · Featured' : ''}</span>
+            <div class="pcard-actions">
+              <button class="ibtn" data-act="up" aria-label="Move up" ${i === 0 ? 'disabled style="opacity:0.3;cursor:not-allowed"' : ''}>
+                <svg viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>
+              </button>
+              <button class="ibtn" data-act="down" aria-label="Move down">
+                <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <button class="ibtn danger" data-act="delete" aria-label="Delete">
+                <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="grid-2 cols">
+            <div class="field">
+              <label>Type</label>
+              <select data-key="type">
+                <option value="side" ${(p.type || 'side') === 'side' ? 'selected' : ''}>Side (half-width)</option>
+                <option value="main" ${(p.type || 'side') === 'main' ? 'selected' : ''}>Main (full-width)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Name</label>
+              <input type="text" data-key="name" value="${escapeHtml(p.name || '')}" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Description</label>
+            <textarea data-key="desc" rows="2">${escapeHtml(p.desc || '')}</textarea>
+          </div>
+          <div class="field">
+            <label>Tags (comma-separated)</label>
+            <input type="text" data-key="tags" value="${escapeHtml((p.tags || []).join(', '))}" />
+          </div>
+          <div class="field">
+            <label>Link URL</label>
+            <input type="url" data-key="link" value="${escapeHtml(p.link || '')}" placeholder="https://..." />
+          </div>
+        </div>
+      `;
+    }
+
+    function attachProjectListeners() {
+      $$('.pcard .ibtn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          const card = btn.closest('.pcard');
+          const i = parseInt(card.dataset.i, 10);
+          const act = btn.dataset.act;
+          const projects = collectProjects();
+
+          if (act === 'delete') {
+            if (projects.length === 1) {
+              toast('Keep at least one card');
+              return;
+            }
+            projects.splice(i, 1);
+          } else if (act === 'up' && i > 0) {
+            [projects[i - 1], projects[i]] = [projects[i], projects[i - 1]];
+          } else if (act === 'down' && i < projects.length - 1) {
+            [projects[i + 1], projects[i]] = [projects[i], projects[i + 1]];
+          }
+
+          renderProjectsList(projects);
+        });
+      });
+    }
+
+    function collectProjects() {
+      return Array.from($$('.pcard')).map(card => {
+        const get = key => card.querySelector(`[data-key="${key}"]`).value.trim();
+        return {
+          name: get('name'),
+          type: get('type') || 'side',
+          desc: get('desc'),
+          tags: get('tags').split(',').map(s => s.trim()).filter(Boolean),
+          link: get('link') || '#'
+        };
+      });
+    }
+
+    function collectAll() {
+      return {
+        profile: {
+          initials: $('#f-initials').value.trim() || 'YD',
+          image:    $('#f-image').value.trim() || '',
+          name:     $('#f-name').value.trim(),
+          role:     $('#f-role').value.trim(),
+          bio:      $('#f-bio').value.trim(),
+          socials: {
+            github:   $('#f-github').value.trim() || '#',
+            linkedin: $('#f-linkedin').value.trim() || '#',
+            twitter:  $('#f-twitter').value.trim() || '#'
+          }
+        },
+        projects: collectProjects()
+      };
+    }
+
+    /* ── Add card ─────────────────────────────────── */
+    $('#add-project').addEventListener('click', () => {
+      const projects = collectProjects();
+      projects.push({
+        name: 'New Project',
+        type: 'side',
+        desc: 'Short description goes here.',
+        tags: ['Tag'],
+        link: '#'
+      });
+      renderProjectsList(projects);
+      // Scroll to the new card
+      setTimeout(() => {
+        const last = $$('.pcard');
+        last[last.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
+    });
+
+    /* ── Profile image file upload ────────────────── */
+    $('#f-image-file').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          $('#f-image').value = ev.target.result;
+          toast('Image loaded · click Save to apply');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    /* ── Save / Discard / Reset ───────────────────── */
+    $('#save').addEventListener('click', () => {
+      const data = collectAll();
+      saveData(data);
+      toast('Saved · refresh the live page to see changes');
+    });
+
+    $('#discard').addEventListener('click', () => {
+      if (confirm('Discard unsaved changes?')) {
+        populateEditor(loadData());
+        toast('Reverted');
+      }
+    });
+
+    $('#reset-data').addEventListener('click', () => {
+      if (confirm('Reset all content to defaults? This cannot be undone.')) {
+        resetData();
+        populateEditor(loadData());
+        toast('Reset to defaults — click Save to apply');
+      }
+    });
+
+    /* ── Init ─────────────────────────────────────── */
+    showGate();
+  </script>
+
+  <script>
+    /* ── Charcoal / sheen WebGL background ──────────── */
+    (function () {
+      'use strict';
+      const canvas = document.getElementById('bg');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (!gl) { canvas.style.display = 'none'; return; }
+
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const VS = `attribute vec2 a; void main() { gl_Position = vec4(a, 0.0, 1.0); }`;
+
+      const FS = `
+        precision mediump float;
+        uniform float u_t;
+        uniform vec2  u_r;
+        vec2 h2(vec2 p) {
+          p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
+          return -1.0 + 2.0 * fract(sin(p) * 43758.5453);
+        }
+        float gn(vec2 p) {
+          vec2 i = floor(p), f = fract(p);
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix(
+            mix(dot(h2(i), f), dot(h2(i+vec2(1,0)), f-vec2(1,0)), u.x),
+            mix(dot(h2(i+vec2(0,1)), f-vec2(0,1)), dot(h2(i+vec2(1,1)), f-vec2(1,1)), u.x),
+            u.y);
+        }
+        float fbm(vec2 p) {
+          float v = 0.0, a = 0.5;
+          mat2 R = mat2(1.6, 1.2, -1.2, 1.6);
+          for (int i = 0; i < 5; i++) { v += a * gn(p); p = R * p; a *= 0.5; }
+          return v;
+        }
+        void main() {
+          vec2 uv = gl_FragCoord.xy / u_r;
+          uv.x   *= u_r.x / u_r.y;
+          float t = u_t * 0.57;
+          vec2 q = vec2(fbm(uv + vec2(0.0, 0.0)), fbm(uv + vec2(5.2, 1.3)));
+          vec2 r = vec2(fbm(uv + 3.5*q + vec2(1.7,9.2) + 0.15*t),
+                        fbm(uv + 3.5*q + vec2(8.3,2.8) + 0.13*t));
+          float f = 0.5 + 0.5 * fbm(uv + 3.5*r);
+          f = clamp(f * 1.2 - 0.18, 0.0, 1.0);
+          vec3 deep    = vec3(0.003, 0.003, 0.006);
+          vec3 dark1   = vec3(0.012, 0.012, 0.019);
+          vec3 dark2   = vec3(0.028, 0.030, 0.042);
+          vec3 dark3   = vec3(0.052, 0.058, 0.078);
+          vec3 grey1   = vec3(0.095, 0.108, 0.148);
+          vec3 grey2   = vec3(0.155, 0.172, 0.228);
+          vec3 silver1 = vec3(0.720, 0.760, 0.880);
+          vec3 silver2 = vec3(0.95, 0.98, 1.0);
+          vec3 c = mix(deep,    dark1,   smoothstep(0.00, 0.12, f));
+          c      = mix(c,       dark2,   smoothstep(0.10, 0.32, f));
+          c      = mix(c,       dark3,   smoothstep(0.30, 0.48, f));
+          c      = mix(c,       grey1,   smoothstep(0.42, 0.58, f));
+          c      = mix(c,       grey2,   smoothstep(0.54, 0.70, f));
+          c      = mix(c,       silver1, smoothstep(0.55, 0.72, f));
+          c      = mix(c,       silver2, smoothstep(0.65, 0.85, f));
+          c      = mix(c, silver2*0.50, pow(clamp(length(q),0.,1.),1.6)*0.28);
+          float sp1 = pow(max(0.0, gn(uv*58.0 + vec2( t*5.1, t*3.3))), 11.0);
+          float sp2 = pow(max(0.0, gn(uv*40.0 + vec2(-t*3.8, t*5.7))), 13.0);
+          float sp3 = pow(max(0.0, gn(uv*75.0 + vec2( t*2.4,-t*4.9))), 15.0);
+          c += (sp1*0.60 + sp2*0.45 + sp3*0.30) * vec3(0.78, 0.84, 1.00);
+          c.b *= 1.08; c.r *= 0.94;
+          vec2 vc = gl_FragCoord.xy / u_r - 0.5;
+          c *= 1.0 - dot(vc, vc) * 0.42;
+          c *= 0.95;
+          gl_FragColor = vec4(c, 1.0);
+        }
+      `;
+
+      function mkShader(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src); gl.compileShader(s);
+        return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+      }
+      const vs = mkShader(gl.VERTEX_SHADER, VS);
+      const fs = mkShader(gl.FRAGMENT_SHADER, FS);
+      if (!vs || !fs) { canvas.style.display = 'none'; return; }
+
+      const prog = gl.createProgram();
+      gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.style.display = 'none'; return; }
+      gl.useProgram(prog);
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+      const aLoc = gl.getAttribLocation(prog, 'a');
+      gl.enableVertexAttribArray(aLoc);
+      gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
+
+      const uT = gl.getUniformLocation(prog, 'u_t');
+      const uR = gl.getUniformLocation(prog, 'u_r');
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width  = window.innerWidth  * dpr;
+        canvas.height = window.innerHeight * dpr;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform2f(uR, canvas.width, canvas.height);
+      }
+      window.addEventListener('resize', resize, { passive: true });
+      resize();
+
+      const t0 = performance.now();
+      (function draw() {
+        gl.uniform1f(uT, reduced ? 2.0 : (performance.now() - t0) / 1000);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        if (!reduced) requestAnimationFrame(draw);
+      })();
+    })();
+  </script>
+</body>
+</html>
