@@ -637,14 +637,9 @@
     /* ── Gate flow ────────────────────────────────── */
     function showGate() {
       hide('#editor');
-      hide('#gate-login');
       hide('#gate-unconfigured');
-      if (!hasSecret()) {
-        show('#gate-unconfigured');
-      } else {
-        show('#gate-login');
-        setTimeout(() => $('#login-input').focus(), 50);
-      }
+      show('#gate-login');
+      setTimeout(() => $('#login-input').focus(), 50);
     }
 
     function showEditor() {
