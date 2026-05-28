@@ -407,8 +407,20 @@
   <script src="data.js"></script>
   <script>
     /* ── Render profile + projects from data ───────────── */
-    (function () {
-      const data = loadData();
+    (async function () {
+      let data;
+
+      // Try to load from Redis API first (cross-device sync)
+      try {
+        const res = await fetch('/api/load-profile', { cache: 'no-store' });
+        if (res.ok) {
+          data = await res.json();
+        } else {
+          data = loadData(); // Fallback to localStorage
+        }
+      } catch (e) {
+        data = loadData(); // Fallback to localStorage if API fails
+      }
 
       // Profile
       const avaEl = document.getElementById('ava');

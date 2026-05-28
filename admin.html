@@ -554,9 +554,9 @@
           </div>
 
           <div class="field">
-            <label for="f-image-file">Profile Image <span style="color: #888; font-size: 11px;">(upload or paste URL)</span></label>
+            <label for="f-image-file">Profile Image <span style="color: #888; font-size: 11px;">(JPG, PNG, GIF, WebP)</span></label>
             <div style="display: flex; gap: 8px; flex-direction: column;">
-              <input type="file" id="f-image-file" accept="image/*" />
+              <input type="file" id="f-image-file" accept=".jpg,.jpeg,.png,.gif,.webp,image/*" />
               <input type="text" id="f-image" placeholder="Or paste image URL here..." />
             </div>
           </div>
@@ -642,11 +642,25 @@
       setTimeout(() => $('#login-input').focus(), 50);
     }
 
-    function showEditor() {
+    async function showEditor() {
       hide('#gate-login');
       hide('#gate-unconfigured');
       show('#editor');
-      populateEditor(loadData());
+
+      // Try to load from Redis API first (cross-device sync)
+      let data;
+      try {
+        const res = await fetch('/api/load-profile', { cache: 'no-store' });
+        if (res.ok) {
+          data = await res.json();
+        } else {
+          data = loadData(); // Fallback to localStorage
+        }
+      } catch (e) {
+        data = loadData(); // Fallback to localStorage if API fails
+      }
+
+      populateEditor(data);
     }
 
     /* Login */
@@ -815,20 +829,44 @@
     $('#f-image-file').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
+        // Warn if file is large (localStorage limit ~5-10MB)
+        if (file.size > 2 * 1024 * 1024) {
+          toast(`⚠ File is ${(file.size / 1024 / 1024).toFixed(1)}MB — may be too large for storage`);
+        }
         const reader = new FileReader();
+        reader.onerror = () => {
+          toast('Error reading file — try a different image');
+        };
         reader.onload = (ev) => {
-          $('#f-image').value = ev.target.result;
-          toast('Image loaded · click Save to apply');
+          const dataUrl = ev.target.result;
+          $('#f-image').value = dataUrl;
+          const sizeMB = (dataUrl.length / 1024 / 1024).toFixed(2);
+          toast(`Image loaded (${sizeMB}MB) · click Save to apply`);
         };
         reader.readAsDataURL(file);
       }
     });
 
     /* ── Save / Discard / Reset ───────────────────── */
-    $('#save').addEventListener('click', () => {
+    $('#save').addEventListener('click', async () => {
       const data = collectAll();
-      saveData(data);
-      toast('Saved · refresh the live page to see changes');
+      saveData(data); // Save to localStorage
+
+      // Also save to Redis (for cross-device sync)
+      try {
+        const res = await fetch('/api/save-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          toast('Saved to cloud · refresh the live page to see changes');
+        } else {
+          toast('Saved locally · cloud save failed (check internet)');
+        }
+      } catch (e) {
+        toast('Saved locally · cloud save failed (check internet)');
+      }
     });
 
     $('#discard').addEventListener('click', () => {
