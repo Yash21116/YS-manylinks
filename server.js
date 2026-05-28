@@ -7,6 +7,7 @@
 const http = require('http');
 const fs   = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const PORT = 3333;
 const ROOT = __dirname;
@@ -44,7 +45,8 @@ http.createServer((req, res) => {
   // Inject ADMIN_SECRET_HASH from .env into config.js on the fly
   if (urlPath === '/config.js') {
     const env = readEnv();
-    const hash = (env.ADMIN_PASSWORD || env.ADMIN_SECRET_HASH || '').replace(/['"\\]/g, '');
+    const plaintext = env.ADMIN_PASSWORD || env.ADMIN_SECRET_HASH || '';
+    const hash = crypto.createHash('sha256').update(plaintext).digest('hex');
     res.writeHead(200, { 'Content-Type': MIME['.js'], 'Cache-Control': 'no-store' });
     res.end(`window.ADMIN_SECRET_HASH = '${hash}';\n`);
     return;

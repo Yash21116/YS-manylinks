@@ -93,15 +93,19 @@ function resetData() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-/* ── Secret — plaintext password stored in config.js as window.ADMIN_SECRET_HASH ── */
+/* ── Secret — SHA-256 hash stored in config.js as window.ADMIN_SECRET_HASH ── */
 function hasSecret() {
   return typeof window.ADMIN_SECRET_HASH === 'string' &&
          window.ADMIN_SECRET_HASH.length > 0;
 }
 
-function checkSecret(input) {
+async function checkSecret(input) {
   if (!hasSecret()) return false;
-  return input === window.ADMIN_SECRET_HASH;
+  const msgBuffer = new TextEncoder().encode(input);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex === window.ADMIN_SECRET_HASH;
 }
 
 /* ── HTML escaping ─────────────────────────────────────────── */

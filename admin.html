@@ -654,7 +654,7 @@
       e.preventDefault();
       const input = $('#login-input').value;
       const err = $('#login-error');
-      if (checkSecret(input)) {
+      if (await checkSecret(input)) {
         err.textContent = ' ';
         $('#login-input').value = '';
         showEditor();

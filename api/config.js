@@ -1,13 +1,8 @@
-/**
- * Vercel serverless function — serves window.ADMIN_SECRET_HASH
- * from the ADMIN_SECRET_HASH environment variable set in the
- * Vercel dashboard (Settings → Environment Variables).
- *
- * Mapped to /config.js via vercel.json rewrites so it's a
- * drop-in replacement for the local server.js behaviour.
- */
+const crypto = require('crypto');
+
 module.exports = function handler(req, res) {
-  const hash = (process.env.ADMIN_PASSWORD || '').replace(/['"\\]/g, '');
+  const plaintext = process.env.ADMIN_PASSWORD || process.env.ADMIN_SECRET_HASH || '';
+  const hash = plaintext ? crypto.createHash('sha256').update(plaintext).digest('hex') : '';
   res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store, no-cache');
   res.end(`window.ADMIN_SECRET_HASH = '${hash}';\n`);
