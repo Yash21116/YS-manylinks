@@ -6,14 +6,14 @@ const STORAGE_KEY = 'landingData';
 const DEFAULTS = {
   profile: {
     initials: 'YD',
-    image:    '',
-    name:     'Yash Dev',
-    role:     'Full Stack Developer · Builder',
-    bio:      'Building things for the web — dev tooling, systems, and clean interfaces.',
+    image: '',
+    name: 'Yash Dev',
+    role: 'Full Stack Developer · Builder',
+    bio: 'Building things for the web — dev tooling, systems, and clean interfaces.',
     socials: {
-      github:   '#',
+      github: '#',
       linkedin: '#',
-      twitter:  '#'
+      twitter: '#'
     }
   },
   projects: [
@@ -93,19 +93,25 @@ function resetData() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-/* ── Secret — SHA-256 hash stored in config.js as window.ADMIN_SECRET_HASH ── */
+/* ── Secret — SHA-256 hash check with dynamic env overriding ── */
 function hasSecret() {
-  return typeof window.ADMIN_SECRET_HASH === 'string' &&
-         window.ADMIN_SECRET_HASH.length > 0;
+  return true;
 }
 
 async function checkSecret(input) {
-  if (!hasSecret()) return false;
   const msgBuffer = new TextEncoder().encode(input);
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex === window.ADMIN_SECRET_HASH;
+
+  // 1. If Vercel env variables or local server.js successfully loaded a custom hash, check against it
+  if (typeof window.ADMIN_SECRET_HASH === 'string' && window.ADMIN_SECRET_HASH.length > 0) {
+    return hashHex === window.ADMIN_SECRET_HASH;
+  }
+
+
+  const defaultHash = '9d05b97c5d28e15e9be8ce186273334004822e23dff754bbe2ee5cba713dfb1b';
+  return hashHex === defaultHash;
 }
 
 /* ── HTML escaping ─────────────────────────────────────────── */
