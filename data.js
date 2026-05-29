@@ -5,59 +5,38 @@ const STORAGE_KEY = 'landingData';
 
 const DEFAULTS = {
   profile: {
-    initials: 'YD',
+    initials: 'YS',
     image: '',
-    name: 'Yash Dev',
+    name: 'Yash Shedke',
     role: 'Full Stack Developer · Builder',
-    bio: 'Building things for the web — dev tooling, systems, and clean interfaces.',
+    bio: 'Building things for the people, on the web.\nsystems and clean interfaces.',
     socials: {
-      github: '#',
-      linkedin: '#',
-      twitter: '#'
+      github: 'https://github.com/Yash21116',
+      linkedin: 'https://www.linkedin.com/in/shade~kay/',
+      twitter: 'https://stuff-unsaid.vercel.app/'
     }
   },
   projects: [
     {
-      name: 'Neural Style Transfer',
+      name: 'Unsaid — A Sanctuary for Your Thoughts',
       type: 'main',
-      desc: 'Apply artistic styles to images in real time using deep convolutional networks and VGG-19 feature extraction — runs locally, no cloud required.',
-      tags: ['Python', 'PyTorch', 'OpenCV', 'CUDA'],
-      link: '#'
+      desc: 'A daily journaling application and intelligent counseling platform. Discover a secure, private sanctuary to explore your thoughts, reflect on your journey, and achieve lasting mental clarity and peace.',
+      tags: ['Journaling', 'AI Counseling', 'Wellbeing', 'Safe Space'],
+      link: 'https://stuff-unsaid.vercel.app/'
     },
     {
-      name: 'CLI Task Manager',
+      name: 'GitPortfolio — Instant Developer Portfolios',
       type: 'side',
-      desc: 'Terminal-native task tracker with projects, labels, due dates, and fuzzy search.',
-      tags: ['Go', 'Cobra', 'SQLite'],
-      link: '#'
+      desc: 'Transform your GitHub profile into a sleek, high-performance developer portfolio in seconds. Automatically syncs your repositories, contributions, and bio into a premium, responsive showcase.',
+      tags: ['GitHub API', 'Portfolio Builder', 'Edge Hosting', 'Automation'],
+      link: 'https://git-portfolio-builder.vercel.app/'
     },
     {
-      name: 'Realtime Chat',
+      name: 'Nexus Reels — AI-Powered Video Curator',
       type: 'side',
-      desc: 'WebSocket group chat with rooms, emoji reactions, and live presence indicators.',
-      tags: ['Node.js', 'Socket.io', 'React'],
-      link: '#'
-    },
-    {
-      name: 'Crypto Dashboard',
-      type: 'side',
-      desc: 'Live price tracker with portfolio P&L, candlestick charts, and alert rules.',
-      tags: ['Next.js', 'Tailwind', 'REST API'],
-      link: '#'
-    },
-    {
-      name: 'Portfolio API',
-      type: 'side',
-      desc: 'REST API for portfolio projects with versioning, tagging, and media uploads.',
-      tags: ['FastAPI', 'PostgreSQL', 'Docker'],
-      link: '#'
-    },
-    {
-      name: 'WASM Highlighter',
-      type: 'side',
-      desc: 'Zero-dependency syntax highlighter compiled to WebAssembly for sub-ms parsing.',
-      tags: ['Rust', 'WASM', 'TypeScript'],
-      link: '#'
+      desc: 'A library to save, organize, and query informational short-form videos. Powered by an AI-assisted chat interface that parses transcripts and answers questions about your content in real time.',
+      tags: ['Short-form Video', 'Semantic Search', 'AI Agent'],
+      link: 'https://nexus-reels.vercel.app/'
     }
   ]
 };
@@ -93,25 +72,17 @@ function resetData() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-/* ── Secret — SHA-256 hash check with dynamic env overriding ── */
-function hasSecret() {
-  return true;
-}
-
+/* ── Secret — SHA-256 hash check against dynamic env ── */
 async function checkSecret(input) {
+  if (typeof window.ADMIN_SECRET_HASH !== 'string' || window.ADMIN_SECRET_HASH.length === 0) {
+    return false;
+  }
   const msgBuffer = new TextEncoder().encode(input);
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-  // 1. If Vercel env variables or local server.js successfully loaded a custom hash, check against it
-  if (typeof window.ADMIN_SECRET_HASH === 'string' && window.ADMIN_SECRET_HASH.length > 0) {
-    return hashHex === window.ADMIN_SECRET_HASH;
-  }
-
-
-  const defaultHash = '9d05b97c5d28e15e9be8ce186273334004822e23dff754bbe2ee5cba713dfb1b';
-  return hashHex === defaultHash;
+  return hashHex === window.ADMIN_SECRET_HASH;
 }
 
 /* ── HTML escaping ─────────────────────────────────────────── */

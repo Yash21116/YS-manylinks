@@ -12,9 +12,9 @@ module.exports = async function handler(req, res) {
     // Fallback: return empty data if Redis not configured
     return res.status(200).json({
       profile: {
-        initials: 'YD',
+        initials: 'YS',
         image: '',
-        name: 'Yash Dev',
+        name: 'Yash Shedke',
         role: 'Full Stack Developer · Builder',
         bio: 'Building things for the web — dev tooling, systems, and clean interfaces.',
         socials: { github: '#', linkedin: '#', twitter: '#' }
@@ -32,9 +32,9 @@ module.exports = async function handler(req, res) {
       // Key doesn't exist yet, return defaults
       return res.status(200).json({
         profile: {
-          initials: 'YD',
+          initials: 'YS',
           image: '',
-          name: 'Yash Dev',
+          name: 'Yash Shedke',
           role: 'Full Stack Developer · Builder',
           bio: 'Building things for the web — dev tooling, systems, and clean interfaces.',
           socials: { github: '#', linkedin: '#', twitter: '#' }
@@ -52,9 +52,9 @@ module.exports = async function handler(req, res) {
     // Return defaults on error
     res.status(200).json({
       profile: {
-        initials: 'YD',
+        initials: 'YS',
         image: '',
-        name: 'Yash Dev',
+        name: 'Yash Shedke',
         role: 'Full Stack Developer · Builder',
         bio: 'Building things for the web — dev tooling, systems, and clean interfaces.',
         socials: { github: '#', linkedin: '#', twitter: '#' }

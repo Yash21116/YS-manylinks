@@ -2,8 +2,9 @@
 
 A premium, high-aesthetic landing page and project showcase. It features a real-time WebGL liquid-sheen background, a glassmorphic dashboard interface, and an admin editor to update projects and profile details on the fly.
 
-![Aesthetic Preview](![preview](image.png)) *(Replace with actual screenshot if available)*
+![Aesthetic Preview]![alt text](image-2.png)
 
+You can see the dashboard live at: https://ys-landing.vercel.app/
 ---
 
 ## ✨ Features

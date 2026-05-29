@@ -10,6 +10,109 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── Universal Glass Scrollbar ──────────────────── */
+    /* Webkit-based browsers (Chrome, Safari, Edge) */
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar,
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+      background: transparent !important;
+    }
+    html::-webkit-scrollbar-track, 
+    html::-webkit-scrollbar-track-piece,
+    html::-webkit-scrollbar-corner,
+    html::-webkit-resizer,
+    body::-webkit-scrollbar-track, 
+    body::-webkit-scrollbar-track-piece,
+    body::-webkit-scrollbar-corner,
+    body::-webkit-resizer,
+    ::-webkit-scrollbar-track, 
+    ::-webkit-scrollbar-track-piece,
+    ::-webkit-scrollbar-corner,
+    ::-webkit-resizer {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    html::-webkit-scrollbar-thumb,
+    body::-webkit-scrollbar-thumb,
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.5) !important;
+      border: 1px solid rgba(255, 255, 255, 0.65) !important;
+      border-radius: 9999px !important;
+      box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.2) !important;
+      background-clip: padding-box !important;
+    }
+    html::-webkit-scrollbar-thumb:hover,
+    body::-webkit-scrollbar-thumb:hover,
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.75) !important;
+      border-color: rgba(255, 255, 255, 0.9) !important;
+    }
+    html::-webkit-scrollbar-thumb:active,
+    body::-webkit-scrollbar-thumb:active,
+    ::-webkit-scrollbar-thumb:active {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border-color: #ffffff !important;
+    }
+    /* Scrollbar buttons (arrows) */
+    html::-webkit-scrollbar-button:single-button,
+    body::-webkit-scrollbar-button:single-button,
+    ::-webkit-scrollbar-button:single-button {
+      background-color: rgba(255, 255, 255, 0.15) !important;
+      display: block !important;
+      background-repeat: no-repeat !important;
+      background-size: 8px !important;
+      background-position: center !important;
+      border-radius: 4px !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      width: 12px !important;
+      height: 12px !important;
+    }
+    html::-webkit-scrollbar-button:single-button:hover,
+    body::-webkit-scrollbar-button:single-button:hover,
+    ::-webkit-scrollbar-button:single-button:hover {
+      background-color: rgba(255, 255, 255, 0.3) !important;
+      border-color: rgba(255, 255, 255, 0.5) !important;
+    }
+    html::-webkit-scrollbar-button:single-button:active,
+    body::-webkit-scrollbar-button:single-button:active,
+    ::-webkit-scrollbar-button:single-button:active {
+      background-color: rgba(255, 255, 255, 0.5) !important;
+      border-color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    /* Vertical Scrollbar Arrows */
+    html::-webkit-scrollbar-button:single-button:vertical:decrement,
+    body::-webkit-scrollbar-button:single-button:vertical:decrement,
+    ::-webkit-scrollbar-button:single-button:vertical:decrement {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23ffffff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'><polyline points='15,65 50,30 85,65'/></svg>") !important;
+    }
+    html::-webkit-scrollbar-button:single-button:vertical:increment,
+    body::-webkit-scrollbar-button:single-button:vertical:increment,
+    ::-webkit-scrollbar-button:single-button:vertical:increment {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23ffffff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'><polyline points='15,35 50,70 85,35'/></svg>") !important;
+    }
+
+    /* Horizontal Scrollbar Arrows */
+    html::-webkit-scrollbar-button:single-button:horizontal:decrement,
+    body::-webkit-scrollbar-button:single-button:horizontal:decrement,
+    ::-webkit-scrollbar-button:single-button:horizontal:decrement {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23ffffff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'><polyline points='65,15 30,50 65,85'/></svg>") !important;
+    }
+    html::-webkit-scrollbar-button:single-button:horizontal:increment,
+    body::-webkit-scrollbar-button:single-button:horizontal:increment,
+    ::-webkit-scrollbar-button:single-button:horizontal:increment {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23ffffff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'><polyline points='35,15 70,50 35,85'/></svg>") !important;
+    }
+
+    /* Firefox Fallback */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+    }
+
     :root {
       --bg-0:       #050507;
       --hi:         #F4F4F6;
@@ -27,25 +130,33 @@
       --danger:     #F87171;
     }
 
-    html { color-scheme: dark; }
+    html {
+      color-scheme: dark;
+      background: transparent !important;
+      overflow: hidden;
+      height: 100%;
+    }
 
     body {
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 0%, #161618 0%, transparent 70%),
-        linear-gradient(180deg, #08080a 0%, #050507 100%);
+      background: transparent !important;
       color: var(--hi);
       font-family: var(--fb);
       font-size: 15px;
       line-height: 1.55;
-      min-height: 100svh;
+      height: 100vh;
+      overflow-y: auto;
       overflow-x: hidden;
+      scroll-behavior: smooth;
       -webkit-font-smoothing: antialiased;
     }
 
     #bg {
       position: fixed; inset: 0;
-      width: 100%; height: 100%;
+      width: 100vw; height: 100vh;
       z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, #161618 0%, transparent 70%),
+        linear-gradient(180deg, #08080a 0%, #050507 100%) !important;
     }
 
     .page {
@@ -637,9 +748,14 @@
     /* ── Gate flow ────────────────────────────────── */
     function showGate() {
       hide('#editor');
-      hide('#gate-unconfigured');
-      show('#gate-login');
-      setTimeout(() => $('#login-input').focus(), 50);
+      if (typeof window.ADMIN_SECRET_HASH !== 'string' || window.ADMIN_SECRET_HASH.length === 0) {
+        hide('#gate-login');
+        show('#gate-unconfigured');
+      } else {
+        hide('#gate-unconfigured');
+        show('#gate-login');
+        setTimeout(() => $('#login-input').focus(), 50);
+      }
     }
 
     async function showEditor() {
@@ -792,7 +908,7 @@
     function collectAll() {
       return {
         profile: {
-          initials: $('#f-initials').value.trim() || 'YD',
+          initials: $('#f-initials').value.trim() || 'YS',
           image:    $('#f-image').value.trim() || '',
           name:     $('#f-name').value.trim(),
           role:     $('#f-role').value.trim(),
