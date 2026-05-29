@@ -9,7 +9,7 @@ const DEFAULTS = {
     image: '',
     name: 'Yash Shedke',
     role: 'Full Stack Developer · Builder',
-    bio: 'Building things for the people, on the web.\nsystems and clean interfaces.',
+    bio: 'Building things for the people, on the web.\nBuilding Intelligent Systems and Clean Interfaces.',
     socials: {
       github: 'https://github.com/Yash21116',
       linkedin: 'https://www.linkedin.com/in/shade~kay/',
