@@ -43,8 +43,9 @@ You can see the dashboard live at: https://ys-landing.vercel.app/
 2. **Configure your environment**:
    Create a `.env` file at the root:
    ```bash
-   ADMIN_SECRET_HASH=your_memorable_secret
+   ADMIN_PASSWORD=your_memorable_secret
    ```
+   (The server hashes this internally — never store a pre-hashed value)
 
 3. **Start the local server**:
    ```bash
@@ -59,15 +60,30 @@ You can see the dashboard live at: https://ys-landing.vercel.app/
 1. Deploy the directory using Vercel.
 2. In your **Vercel Project Dashboard**, navigate to **Settings** → **Environment Variables**.
 3. Add the following environment variable:
-   - **Key**: `ADMIN_SECRET_HASH`
+   - **Key**: `ADMIN_PASSWORD`
    - **Value**: `your_memorable_secret`
-4. Redeploy the application. The Vercel Serverless function (`/api/config.js`) will automatically serve the secret hash to the admin login gate.
+   (The serverless function `/api/verify-admin` will hash this server-side for verification)
+4. Redeploy the application.
+
+**Security Note**: Vercel automatically serves all deployments over **HTTPS**, which encrypts your admin password in transit. The server-side password verification prevents the hash from ever being exposed to the browser.
 
 ---
 
 ## 🔑 Security & Configuration
 
-The local `config.js` file is untracked by Git to prevent your credentials from being exposed in public repositories. 
+### Admin Authentication
 
-- **Local Server**: Serves `.env` dynamically on the fly to bypass static config files.
-- **Production Server (Vercel)**: Rewrites requests to `/config.js` to `/api/config.js` which dynamically injects your Vercel Environment Variables.
+The admin console uses **server-side password verification** to protect against browser-based attacks:
+
+- **Password Hashing**: The password is hashed using SHA-256 on the server (never exposed to the browser)
+- **Server Verification**: The `/api/verify-admin` endpoint compares hashes server-side only
+- **HTTPS Encryption** (Production): All passwords in transit are encrypted by HTTPS
+  - ✓ Local development (HTTP): Safe because there's no network to sniff
+  - ✓ Vercel production (HTTPS): Passwords are encrypted in transit + verified server-side
+
+### Environment Variables
+
+- **Local**: Set `ADMIN_PASSWORD` in `.env` (untracked by Git for security)
+- **Vercel**: Set `ADMIN_PASSWORD` in Project Settings → Environment Variables
+
+Never commit `.env` or `config.js` to version control.

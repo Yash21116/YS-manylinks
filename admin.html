@@ -616,7 +616,7 @@
         </svg>
       </div>
       <h1 class="gate-title">Not configured</h1>
-      <p class="gate-sub">Set <code style="font-family:monospace;background:rgba(255,255,255,0.07);padding:2px 6px;border-radius:5px;font-size:12px">ADMIN_SECRET_HASH</code> in <code style="font-family:monospace;background:rgba(255,255,255,0.07);padding:2px 6px;border-radius:5px;font-size:12px">config.js</code> to enable admin access.</p>
+      <p class="gate-sub">Configure the key in <code style="font-family:monospace;background:rgba(255,255,255,0.07);padding:2px 6px;border-radius:5px;font-size:12px">config.js</code> to enable admin access.</p>
     </div>
 
     <!-- ── Editor ───────────────────────────────────── -->
@@ -727,7 +727,6 @@
 
   <div id="toast" role="status" aria-live="polite"></div>
 
-  <script src="config.js"></script>
   <script src="data.js"></script>
   <script>
     /* ── Mini helpers ─────────────────────────────── */
@@ -746,15 +745,24 @@
     }
 
     /* ── Gate flow ────────────────────────────────── */
-    function showGate() {
+    async function showGate() {
       hide('#editor');
-      if (typeof window.ADMIN_SECRET_HASH !== 'string' || window.ADMIN_SECRET_HASH.length === 0) {
-        hide('#gate-login');
-        show('#gate-unconfigured');
-      } else {
+      try {
+        const res = await fetch('/api/admin-configured', { cache: 'no-store' });
+        if (res.ok) {
+          const { configured } = await res.json();
+          if (!configured) {
+            hide('#gate-login');
+            show('#gate-unconfigured');
+          } else {
+            hide('#gate-unconfigured');
+            show('#gate-login');
+            setTimeout(() => $('#login-input').focus(), 50);
+          }
+        }
+      } catch (e) {
         hide('#gate-unconfigured');
         show('#gate-login');
-        setTimeout(() => $('#login-input').focus(), 50);
       }
     }
 
@@ -782,15 +790,29 @@
     /* Login */
     $('#login-form').addEventListener('submit', async e => {
       e.preventDefault();
-      const input = $('#login-input').value;
+      const password = $('#login-input').value;
       const err = $('#login-error');
-      if (await checkSecret(input)) {
-        err.textContent = ' ';
-        $('#login-input').value = '';
-        showEditor();
-      } else {
-        err.textContent = 'Incorrect secret.';
-        $('#login-input').select();
+      try {
+        const res = await fetch('/api/verify-admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        if (res.ok) {
+          const { valid } = await res.json();
+          if (valid) {
+            err.textContent = ' ';
+            $('#login-input').value = '';
+            showEditor();
+          } else {
+            err.textContent = 'Incorrect secret.';
+            $('#login-input').select();
+          }
+        } else {
+          err.textContent = 'Server error.';
+        }
+      } catch (e) {
+        err.textContent = 'Connection error.';
       }
     });
 

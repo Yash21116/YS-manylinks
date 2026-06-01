@@ -1,13 +1,14 @@
 /**
- * server.js — zero-dependency static server with .env injection.
- * Reads .env on every request to /config.js so you can update the
- * secret hash without restarting.
+ * server.js — zero-dependency static server with server-side auth.
+ * Handles admin login verification on the backend to prevent
+ * exposing password hashes to the client.
  */
 
 const http = require('http');
 const fs   = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const url = require('url');
 
 const PORT = 3333;
 const ROOT = __dirname;
@@ -38,17 +39,44 @@ function readEnv() {
   } catch { return {}; }
 }
 
+// Verify admin password server-side
+function verifyAdminPassword(plaintext) {
+  const env = readEnv();
+  const stored = env.ADMIN_PASSWORD || env.ADMIN_SECRET_HASH || '';
+  if (!stored) return false;
+  const inputHash = crypto.createHash('sha256').update(plaintext).digest('hex');
+  const storedHash = crypto.createHash('sha256').update(stored).digest('hex');
+  return inputHash === storedHash;
+}
+
 http.createServer((req, res) => {
   const reqPath = req.url.split('?')[0];
   const urlPath = reqPath === '/' ? '/index.html' : reqPath;
 
-  // Inject ADMIN_SECRET_HASH from .env into config.js on the fly
-  if (urlPath === '/config.js') {
+  // Server-side admin password verification
+  if (urlPath === '/api/verify-admin' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { password } = JSON.parse(body);
+        const isValid = verifyAdminPassword(password || '');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ valid: isValid }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid request' }));
+      }
+    });
+    return;
+  }
+
+  // Check if admin is configured (don't expose the hash)
+  if (urlPath === '/api/admin-configured') {
     const env = readEnv();
-    const plaintext = env.ADMIN_PASSWORD || env.ADMIN_SECRET_HASH || '';
-    const hash = crypto.createHash('sha256').update(plaintext).digest('hex');
-    res.writeHead(200, { 'Content-Type': MIME['.js'], 'Cache-Control': 'no-store' });
-    res.end(`window.ADMIN_SECRET_HASH = '${hash}';\n`);
+    const isConfigured = !!(env.ADMIN_PASSWORD || env.ADMIN_SECRET_HASH);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ configured: isConfigured }));
     return;
   }
 
