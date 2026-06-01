@@ -602,22 +602,7 @@
   <script src="data.js"></script>
   <script>
     /* ── Render profile + projects from data ───────────── */
-    (async function () {
-      let data;
-
-      // Try to load from Redis API first (cross-device sync)
-      try {
-        const res = await fetch('/api/load-profile', { cache: 'no-store' });
-        if (res.ok) {
-          data = await res.json();
-        } else {
-          data = loadData(); // Fallback to localStorage
-        }
-      } catch (e) {
-        data = loadData(); // Fallback to localStorage if API fails
-      }
-
-      // Profile
+    function renderData(data) {
       const avaEl = document.getElementById('ava');
       if (data.profile.image) {
         avaEl.innerHTML = `<img src="${escapeHtml(data.profile.image)}" alt="Profile" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
@@ -631,7 +616,6 @@
       document.getElementById('soc-linkedin').href  = data.profile.socials.linkedin || '#';
       document.getElementById('soc-twitter').href   = data.profile.socials.twitter  || '#';
 
-      // Projects
       const grid = document.getElementById('grid');
       grid.innerHTML = data.projects.map((p) => `
         <article class="lg card ${(p.type || 'side') === 'main' ? 'main' : 'side'}">
@@ -650,6 +634,24 @@
           </a>
         </article>
       `).join('');
+    }
+
+    // Render immediately with local data (no blank flash)
+    renderData(loadData());
+
+    // Then fetch from Redis and update if different
+    (async function () {
+      try {
+        const res = await fetch('/api/load-profile', { cache: 'no-store' });
+        if (res.ok) {
+          const remoteData = await res.json();
+          if (remoteData && remoteData.profile && Array.isArray(remoteData.projects)) {
+            renderData(remoteData);
+          }
+        }
+      } catch (e) {
+        // Already rendered local data above, nothing to do
+      }
     })();
   </script>
 
