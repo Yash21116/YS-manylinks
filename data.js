@@ -37,6 +37,20 @@ const DEFAULTS = {
       desc: 'A library to save, organize, and query informational short-form videos. Powered by an AI-assisted chat interface that parses transcripts and answers questions about your content in real time.',
       tags: ['Short-form Video', 'Semantic Search', 'AI Agent'],
       link: 'https://nexus-reels.vercel.app/'
+    },
+    {
+      name: 'Projekt-OS — Unified Project Dashboard',
+      type: 'side',
+      desc: 'A real-time project management dashboard that aggregates status, notes, and context from multiple parallel projects in one place. Eliminates manual file-checking and cognitive overhead for solo founders juggling 5+ projects.',
+      tags: ['Project Management', 'Dashboard', 'Real-time Sync', 'State Aggregation'],
+      link: 'https://github.com/Yash21116/Projekt-OS'
+    },
+    {
+      name: '¥$-manylinks — Profile Link Management',
+      type: 'side',
+      desc: 'A lightweight, customizable link aggregator for personal profiles. Consolidate all your important links (portfolio, socials, projects) into a single, branded landing page with rich customization options.',
+      tags: ['Profile Builder', 'Link Aggregation', 'Custom Branding', 'Landing Page'],
+      link: 'https://github.com/Yash21116/YS-manylinks'
     }
   ]
 };
